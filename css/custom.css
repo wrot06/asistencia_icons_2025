@@ -1,0 +1,12 @@
+body {
+  background-color: #f8f9fa;
+}
+
+.box {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.title {
+  color: #363636;
+}
