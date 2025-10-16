@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificación Ponencia</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="css/certificar.css">
+</head>
+
+<body>
+  <section class="hero">
+    <div class="content">
+      <div class="certificate-container">
+        <h1 class="certificate-title">CERTIFICACIÓN</h1>
+        <div id="contenido">
+          <p>Cargando información de la ponencia...</p>
+        </div>
+
+        <div class="buttons is-right">
+          <a href="ponencias.html" class="button is-light">← Volver</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FontAwesome -->
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("ip");
+
+    if (!id) {
+      document.getElementById("contenido").innerHTML = "<p>No se especificó ninguna ponencia.</p>";
+    } else {
+      fetch("api.php", {
+        method: "POST",
+        body: new URLSearchParams({ action: "ver_detalle", id })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const p = data.data;
+          const coautores = p.coautores || [];
+
+          function formatearAutores(autor, coautores) {
+            if (!coautores || coautores.length === 0) return autor;
+            if (coautores.length === 1) return `${autor} y ${coautores[0]}`;
+            const ult = coautores.pop();
+            return `${autor}, ${coautores.join(', ')} y ${ult}`;
+          }
+
+          const listaAutores = formatearAutores(p.nombre_apellido, [...coautores]);
+          const totalAutores = 1 + coautores.length;
+          const verboParticipar = totalAutores > 1 ? "participaron" : "participó";
+          const fecha = new Date();
+          const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
+          const fechaLarga = fecha.toLocaleDateString('es-CO', opciones);
+
+          const textoCertificado = `
+            <p class="certificate-text">
+              El <strong>Centro de Investigaciones y Estudios Socio-Jurídicos (CIESJU)</strong> de la Universidad de Nariño hace constar que 
+              <strong>${listaAutores}</strong> ${verboParticipar} en el 
+              <strong>VII Seminario Nacional ICON-S</strong> 
+              <em>"Democracia, Derechos Humanos e Inteligencia Artificial"</em>,
+              con su ponencia titulada: <strong>${p.titulo_ponencia || "Sin título registrado"}</strong>.
+              Este evento académico se realizó los días <strong>22, 23 y 24 de octubre de 2025</strong>,
+              con una intensidad de <strong>30 horas académicas</strong>, el cual se desarrolló en las instalaciones de la Universidad de Nariño,
+              en la ciudad de Pasto, República de Colombia.
+            </p>
+            <p class="certificate-text">En constancia de lo anterior, se firma en San Juan de Pasto, ${fechaLarga}.</p>
+
+<div class="firmas-container">
+  <div class="firma">
+    <strong><p>LEONARDO A. ENRÍQUEZ MARTÍNEZ<br></strong>Decano<br>Facultad de Derecho y Ciencias Políticas</p>    
+  </div>
+
+  <div class="firma">
+    <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>Director<br>Centro de Investigación y Estudios Socio-Jurídicos</p>    
+  </div>
+</div>
+
+          `;
+
+          let botones = `<div class="has-text-centered">`;
+          botones += `
+            <form method="POST" action="pdf/pdf_certificado.php" target="_blank">
+              <input type="hidden" name="id_ponencia" value="${p.id}">
+              <input type="hidden" name="nombre" value="${p.nombre_apellido}">
+              <button class="button autor-btn" type="submit">
+                Certificado: ${p.nombre_apellido}
+              </button>
+            </form>
+          `;
+          coautores.forEach(c => {
+            botones += `
+              <form method="POST" action="pdf/pdf_certificado.php" target="_blank">
+                <input type="hidden" name="id_ponencia" value="${p.id}">
+                <input type="hidden" name="nombre" value="${c}">
+                <button class="button autor-btn" type="submit">
+                  Certificado: ${c}
+                </button>
+              </form>
+            `;
+          });
+          botones += `</div>`;
+
+          document.getElementById("contenido").innerHTML = textoCertificado + botones;
+        } else {
+          document.getElementById("contenido").innerHTML = `<p>${data.error}</p>`;
+        }
+      })
+      .catch(err => {
+        document.getElementById("contenido").innerHTML = "<p>Error al cargar los datos de la ponencia.</p>";
+        console.error(err);
+      });
+    }
+  </script>
+</body>
+</html>

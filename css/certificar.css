@@ -1,0 +1,368 @@
+/* ========================================================== */
+/* 🌟 THEME 2025 - Certificados con fondo animado adaptativo */
+/* ========================================================== */
+
+/* 1️⃣ Variables CSS */
+:root {
+  --bg-gradient: rgba(217, 221, 219, 0.7);
+  --primary-color: #2c5530;
+  --secondary-color: #4a7c59;
+  --accent-color: #8fb996;
+  --text-dark: #1f1f1f;
+  --text-light: #6b7280;
+  --shadow-light: 0 8px 24px rgba(0,0,0,0.1);
+  --shadow-hover: 0 12px 32px rgba(0,0,0,0.15);
+  --border-radius: 14px;
+  --transition: all 0.3s ease;
+}
+
+/* 2️⃣ Reset global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #d9dddb;
+  color: var(--text-dark);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* ========================================================== */
+/* 3️⃣ Fondo animado adaptativo */
+/* ========================================================== */
+.hero {
+  position: relative;
+  height: 100vh;
+  background: linear-gradient(var(--bg-gradient), var(--bg-gradient)),
+              url('../img/Regional.png') repeat-x top;
+  background-size: auto 100%; /* cubre toda la altura, repite horizontalmente */
+  background-position: top center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  text-align: center;
+  animation: slideBackground 60s linear infinite;
+  will-change: background-position;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 80%);
+  pointer-events: none;
+}
+
+@keyframes slideBackground {
+  0% { background-position: 0 top; }
+  100% { background-position: 100% top; }
+}
+
+/* ========================================================== */
+/* 4️⃣ Contenedor principal */
+/* ========================================================== */
+/* ========================================================== */
+/* 4️⃣ Contenedor principal */
+/* ========================================================== */
+.content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1300px;
+  padding: 40px 60px;
+  margin: 60px auto 0 auto; /* 🔹 espacio desde arriba */
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 5px;
+    margin-top: 10px; /* 🔹 ajustado para móviles */
+  }
+}
+
+
+/* ========================================================== */
+/* 5️⃣ Caja del certificado */
+/* ========================================================== */
+.certificate-container { 
+  width: 95%;
+  max-width: 1400px;
+  margin: 10px auto;
+  padding: 20px 60px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+  text-align: justify;
+  transition: var(--transition);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.certificate-container:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pantallas muy grandes */
+@media (min-width: 1800px) {
+  .certificate-container {
+    max-width: 1600px;
+  }
+}
+
+/* Móviles */
+@media (max-width: 767px) {
+  .certificate-container {
+    max-width: 98%;
+    margin: 10px auto;
+    padding: 5px 2px;
+    border-radius: 10px;
+  }
+}
+
+/* ========================================================== */
+/* 6️⃣ Tipografía */
+/* ========================================================== */
+.certificate-title {
+  font-size: clamp(1rem, 2vw, 2rem);
+  margin-bottom: 30px;
+  text-align: center;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.certificate-title::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.certificate-container:hover .certificate-title::after {
+  width: 100px;
+}
+
+.certificate-text {
+  margin-bottom: 14px;
+  line-height: 1.8;
+  font-size: clamp(1rem, 1vw, 1rem);
+  color: var(--text-dark);
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* ========================================================== */
+/* 7️⃣ Botones personalizados */
+/* ========================================================== */
+.buttons.is-right {
+  margin-top: 10px;
+}
+
+.button.is-light {
+  border: 1px solid #ddd;
+  transition: var(--transition);
+}
+
+.button.is-light:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.autor-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  color: white !important;
+  border: none !important;
+  padding: 5px 5px !important;
+  margin: 5px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  transition: var(--transition) !important;
+  box-shadow: 0 4px 12px rgba(44, 85, 48, 0.3) !important;
+  font-size: 15px;
+}
+
+.autor-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 6px 20px rgba(44, 85, 48, 0.4) !important;
+  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color)) !important;
+}
+
+/* ========================================================== */
+/* 8️⃣ Firmas */
+/* ========================================================== */
+.firmas-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 30px;  
+  padding-top: 10px;  
+  padding-bottom: 20px;
+}
+
+.firma {
+  flex: 1 1 40%;
+  text-align: center;
+  color: var(--text-dark);
+  padding: 0 15px;
+}
+
+.firma p {
+  margin: 2px 0;
+  line-height: 1;
+  font-size: 0.95rem;
+}
+
+.firma strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 2px;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.firma::before {
+  content: "";
+  display: block;
+  width: 70%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+  margin: 0 auto 8px auto;
+  opacity: 0.7;
+}
+
+/* ========================================================== */
+/* 9️⃣ Scrollbar personalizado */
+/* ========================================================== */
+body::-webkit-scrollbar {
+  width: 10px;
+}
+body::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+  border-radius: 4px;
+}
+body::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 4px;
+}
+body::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}
+
+/* ========================================================== */
+/* 🔟 Accesibilidad y rendimiento */
+/* ========================================================== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.button:focus,
+.autor-btn:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* ========================================================== */
+/* 11️⃣ Responsive adicional */
+/* ========================================================== */
+@media (max-width: 1440px) {
+  .certificate-container {
+    padding: 40px 45px;
+  }
+  .certificate-text {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 15px;
+  }
+  .certificate-container {
+    padding: 25px 20px;
+    margin: 15px auto;
+  }
+  .firmas-container {
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 35px;
+  }
+  .firma {
+    flex: 1 1 100%;
+  }
+  .autor-btn {
+    width: 100%;
+    margin: 5px 0 !important;
+    font-size: 10px;
+  }
+}
+
+/* ========================================================== */
+/* 🧭 Orientación landscape en móviles */
+/* ========================================================== */
+@media (max-height: 600px) and (orientation: landscape) {
+  .hero {
+    height: auto;
+    min-height: 100vh;
+    padding: 40px 0;
+  }
+  body {
+    overflow-y: auto;
+  }
+}
+
+/* ========================================================== */
+/* 📱 Corrección: altura y centrado en móviles */
+/* ========================================================== */
+@media (max-width: 768px) {
+  .hero {
+    height: auto;                /* deja que crezca con el contenido */
+    min-height: 100dvh;          /* usa viewport dinámico en móviles modernos */
+    padding-top: 12vh;           /* baja el contenido (ajusta si aún queda muy arriba) */
+    padding-bottom: 5vh;
+    align-items: flex-start;  
+       /* alinea desde arriba, más natural en móviles */
+  }
+
+  .content {
+    margin-top: 0;               /* evita doble separación */
+    padding: 15px 10px;
+  }
+
+  .certificate-container {
+    margin-top: 0;               /* ajusta margen superior */
+  }
+}

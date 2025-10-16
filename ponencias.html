@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ponencias - Congreso Universidad de Nariño</title>
+
+  <!-- Bulma y tema global -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="css/theme2025.css">
+  
+</head>
+
+<body>
+  <section class="hero"> <!-- 🔹 Fondo animado -->
+    <div class="container container-ponencias">
+     
+
+<!-- 🔹 Encabezado con título y buscador -->
+<div class="has-text-centered mb-5" style="margin-top: 60px;">
+  <h1 class="title is-3 has-text-weight-semibold has-text-white mb-4">
+    📚 Listado de Ponencias
+  </h1>
+
+  <div class="field has-addons is-justify-content-center">
+    <div class="control is-expanded" style="max-width: 500px;">
+      <input 
+        type="text" 
+        id="termino" 
+        class="input is-medium" 
+        placeholder="Buscar ponencia o autor...">
+    </div>
+    <div class="control">
+      <button id="btnBuscar" class="button is-primary is-medium">
+        <span class="icon"><i class="fas fa-search"></i></span>
+        <span>Buscar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+      <div class="table-container">
+<table class="table table-ponencias is-striped is-hoverable is-fullwidth">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Autor(es)</th>
+      <th>Título</th>
+      <th>Certificado</th>
+    </tr>
+  </thead>
+  <tbody id="tablaDatos">
+    <tr>
+      <td colspan="4" class="has-text-centered has-text-grey-light">
+        No hay resultados para mostrar.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+      </div>
+    </div>
+
+    <footer class="footer-ponencias">
+      © 2025 Universidad de Nariño - Centro de Investigaciones y Estudios Socio-Jurídicos (CIESJU)
+    </footer>
+  </section>
+
+  <!-- FontAwesome -->
+
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+  <!-- Lógica de búsqueda -->
+<script>
+  function mostrarResultados(data) {
+    let html = '';
+    if (data.length === 0) {
+      html = `<tr><td colspan="4" class="has-text-centered has-text-grey">No se encontraron resultados.</td></tr>`;
+    } else {
+      data.forEach((item, index) => {
+        html += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${item.autores || ''}</td>
+            <td>${item.titulo_ponencia || ''}</td>
+            <td>
+              <a href="certificar.html?ip=${item.id}" class="button is-warning is-fullwidth is-small">
+                <span class="icon"><i class="fas fa-file-certificate"></i></span>
+                <span>Certificar</span>
+              </a>
+            </td>
+          </tr>`;
+      });
+    }
+    $('#tablaDatos').html(html);
+  }
+
+  // 🔹 Buscar manualmente
+  $('#btnBuscar').on('click', function() {
+    const termino = $('#termino').val().trim();
+    if (!termino) {
+      alert('Por favor ingrese un término de búsqueda.');
+      return;
+    }
+
+    $.post('api.php', { action: 'buscar', termino }, function(res) {
+      if (res.success) {
+        mostrarResultados(res.data);
+      } else {
+        alert('No se encontraron resultados.');
+      }
+    }, 'json');
+  });
+
+  // 🔹 Cargar todas las ponencias automáticamente al inicio
+  $(document).ready(function() {
+    $.post('api.php', { action: 'ver_todas' }, function(res) {
+      if (res.success) {
+        mostrarResultados(res.data);
+      } else {
+        $('#tablaDatos').html('<tr><td colspan="4" class="has-text-centered has-text-grey">Error al cargar las ponencias.</td></tr>');
+      }
+    }, 'json');
+  });
+</script>
+
+</body>
+</html>

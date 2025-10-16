@@ -1,157 +1,163 @@
-<!DOCTYPE html>
-<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro de Asistencia Icons 2025</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.5/css/bulma.min.css">
+  <title>Asistencia</title>
+
+  <!-- Bulma y tema global -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <!-- FontAwesome: necesario para los iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-<section class="section">
-  <div class="container">
-    <h1 class="title">Registro de Asistencia Icons 2025</h1>
-    <div id="session-info" class="notification is-info">
-      Cargando sesión activa...
-    </div>
+  <!-- Estructura idéntica al certificado: sección.hero con .content adentro -->
+<section class="hero">
+    <div class="content">
+      <h1 class="title">Registro de Asistencia Icons 2025</h1>
+      <div id="session-info" class="notification is-info">Cargando sesión activa...</div>
 
-    <form id="attendance-form" class="box" style="display:none;">
-      <div class="field">
-        <label class="label">Nombre Completo</label>
-        <div class="control">
-          <input class="input" type="text" id="nombre_completo" required>
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="label">Tipo de Documento</label>
-        <div class="control">
-          <div class="select">
-            <select id="tipo_documento" required>
-              <option value="">Seleccione...</option>
-              <option value="CC">CC</option>
-              <option value="TI">TI</option>
-              <option value="CE">CE</option>
-              <option value="Pasaporte">Pasaporte</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="label">Número de Documento</label>
-        <div class="control">
-          <input class="input" type="text" id="numero_documento" required>
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="label">Correo Electrónico</label>
-        <div class="control">
-          <input class="input" type="email" id="correo_electronico" required>
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="label">Teléfono</label>
-        <div class="control">
-          <input class="input" type="text" id="telefono" required>
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="label">Género</label>
-        <div class="control">
-          <div class="select">
-            <select id="genero" required>
-              <option value="">Seleccione...</option>
-              <option value="Masculino">Masculino</option>
-              <option value="Femenino">Femenino</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <button class="button is-primary" type="submit">Registrar Asistencia</button>
-    </form>
-
-    <div id="message" class="notification is-hidden"></div>
+<form id="attendance-form" class="box" style="display:none;">
+  <div class="field">
+    <label class="label">Nombre Completo</label>
+    <div class="control has-icons-left has-icons-right">
+      <input class="input is-success" type="text" id="nombre_completo" placeholder="Ingrese su nombre completo" required>
+      <span class="icon is-small is-left">
+        <i class="fas fa-user"></i>
+      </span>
+      <span class="icon is-small is-right">
+        <i class="fas fa-check"></i>
+      </span>
+    </div>    
   </div>
-</section>
 
-<script type="module" src="js/api.js"></script>
-<script type="module">
-import { registerAttendee } from "./js/api.js";
+  <div class="field has-addons has-addons-centered">
+    <p class="control">
+      <span class="select">
+        <select id="tipo_documento" required>
+          <option value="">Tipo Doc</option>
+          <option value="CC">CC</option>
+          <option value="TI">TI</option>
+          <option value="CE">CE</option>
+          <option value="Pasaporte">Pasaporte</option>
+        </select>
+      </span>
+    </p>
+    <p class="control is-expanded">
+      <input class="input" type="text" id="numero_documento" placeholder="Número de documento" required>
+    </p>
+  </div>
 
-let currentSessionId = null;
+  <div class="field">
+    <label class="label">Género</label>
+    <div class="control">
+      <div class="select is-fullwidth">
+        <select id="genero" required>
+          <option value="">Seleccione...</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+    </div>
+  </div>
 
-function getNowColombia() {
-  return new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' });
-}
+  <div class="field">
+    <label class="label">Correo Electrónico</label>
+    <div class="control has-icons-left has-icons-right">
+      <input class="input is-medium" type="email" id="correo_electronico" placeholder="ejemplo@correo.com" required>
+      <span class="icon is-left">
+        <i class="fas fa-envelope"></i>
+      </span>
+      <span class="icon is-right">
+        <i class="fas fa-check"></i>
+      </span>
+    </div>
+  </div>
 
-async function loadCurrentSession() {
-  try {
-    const response = await fetch("api_proxy.php?endpoint=current_session");
-    if (!response.ok) throw new Error("No hay sesión activa en este momento");
-    const session = await response.json();
-    currentSessionId = session.id;
+  <div class="field">
+    <label class="label">Teléfono</label>
+    <div class="control has-icons-left has-icons-right">
+      <input class="input is-success" type="tel" id="telefono" placeholder="Ingrese su número de teléfono" required>
+      <span class="icon is-small is-left">
+        <i class="fas fa-phone"></i>
+      </span>
+      <span class="icon is-small is-right">
+        <i class="fas fa-check"></i>
+      </span>
+    </div>    
+  </div>
 
-    // Convertir UTC a hora Colombia usando Intl
-    const startUTC = new Date(session.session_start);
-    const endUTC = new Date(session.session_end);
+  <button class="button is-primary" type="submit">Registrar Asistencia</button>
+</form>
 
-    const startColStr = new Intl.DateTimeFormat('es-CO', {
-      hour: '2-digit', minute: '2-digit', second: '2-digit',
-      hour12: false, timeZone: 'America/Bogota'
-    }).format(startUTC);
 
-    const endColStr = new Intl.DateTimeFormat('es-CO', {
-      hour: '2-digit', minute: '2-digit', second: '2-digit',
-      hour12: false, timeZone: 'America/Bogota'
-    }).format(endUTC);
 
-    document.getElementById("session-info").textContent =
-      `Registro abierto para: ${session.session_name} (${startColStr} - ${endColStr})`;
-    
-    document.getElementById("attendance-form").style.display = "block";
+      <div id="message" class="notification is-hidden"></div>
+    </div>
+  </section>
 
-  } catch (err) {
-    const horaCol = new Date().toLocaleTimeString('es-CO', {
-      hour: '2-digit', minute: '2-digit', second: '2-digit',
-      hour12: false, timeZone: 'America/Bogota'
+  <script type="module" src="js/api.js"></script>
+  <script type="module">
+    import { registerAttendee } from "./js/api.js";
+    let currentSessionId = null;
+
+    async function loadCurrentSession(){
+      try {
+        const response = await fetch("api_proxy.php?endpoint=current_session");
+        if (!response.ok) throw new Error("No hay sesión activa en este momento");
+        const session = await response.json();
+        currentSessionId = session.id;
+
+        const startUTC = new Date(session.session_start);
+        const endUTC = new Date(session.session_end);
+
+        const startColStr = new Intl.DateTimeFormat('es-CO', {
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false, timeZone: 'America/Bogota'
+        }).format(startUTC);
+
+        const endColStr = new Intl.DateTimeFormat('es-CO', {
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false, timeZone: 'America/Bogota'
+        }).format(endUTC);
+
+        document.getElementById("session-info").textContent =
+          `Registro abierto para: ${session.session_name} (${startColStr} - ${endColStr})`;
+        document.getElementById("attendance-form").style.display = "block";
+      } catch (err) {
+        const horaCol = new Date().toLocaleTimeString('es-CO', {
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false, timeZone: 'America/Bogota'
+        });
+        document.getElementById("session-info").textContent =
+          `${err.message} (Hora actual Colombia: ${horaCol})`;
+      }
+    }
+
+    document.getElementById("attendance-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+        const data = {
+          full_name: document.getElementById("nombre_completo").value,
+          document_type: document.getElementById("tipo_documento").value,
+          document_number: document.getElementById("numero_documento").value,
+          email: document.getElementById("correo_electronico").value,
+          phone: document.getElementById("telefono").value,
+          gender: document.getElementById("genero").value,
+          session_id: currentSessionId
+        };
+
+      try {
+        const result = await registerAttendee(data);
+        document.getElementById("message").className = "notification is-success";
+        document.getElementById("message").textContent = `✅ Asistencia registrada con éxito para ${result.full_name}`;
+      } catch (err) {
+        document.getElementById("message").className = "notification is-danger";
+        document.getElementById("message").textContent = err.message;
+      }
+      document.getElementById("message").classList.remove("is-hidden");
     });
-    document.getElementById("session-info").textContent =
-      `${err.message} (Hora actual Colombia: ${horaCol})`;
-  }
-}
 
-document.getElementById("attendance-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const data = {
-    name: document.getElementById("nombre_completo").value,
-    tipo_documento: document.getElementById("tipo_documento").value,
-    numero_documento: document.getElementById("numero_documento").value,
-    correo_electronico: document.getElementById("correo_electronico").value,
-    telefono: document.getElementById("telefono").value,
-    genero: document.getElementById("genero").value,
-    session_id: currentSessionId
-  };
-
-  try {
-    const result = await registerAttendee(data);
-    document.getElementById("message").className = "notification is-success";
-    document.getElementById("message").textContent = `Asistencia registrada con éxito para ${result.name}`;
-    document.getElementById("attendance-form").reset();
-  } catch (err) {
-    document.getElementById("message").className = "notification is-danger";
-    document.getElementById("message").textContent = err.message;
-  }
-  document.getElementById("message").classList.remove("is-hidden");
-});
-
-loadCurrentSession();
-</script>
-
-
+    loadCurrentSession();
+  </script>
 </body>
 </html>
