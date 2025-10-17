@@ -1,5 +1,5 @@
-/* ============================== */
-/* 1. Reset básico y estilos globales */
+* ============================== */
+/* 1. Reset y estilos globales */
 /* ============================== */
 * {
   margin: 0;
@@ -11,35 +11,59 @@ html, body {
   height: 100%;
   font-family: Arial, sans-serif;
   background-color: #D9DDDB;
-  overflow: hidden; /* oculta scroll global */
+  overflow-x: hidden; /* no scroll horizontal */
+  overflow-y: auto;   /* scroll vertical visible */
 }
 
 /* ============================== */
-/* 2. Sección Hero */
+/* 2. Fondo animado fijo */
 /* ============================== */
 :root {
   --bg-gradient: rgba(217,221,219,0.7);
 }
 
-/* ============================== */
-/* 2. Sección Hero (con animación horizontal) */
-/* ============================== */
-.hero {
-  position: relative;
-  height: 100vh; /* ocupa exactamente el viewport */
+.hero::before {
+  content: "";
+  position: fixed;
+  inset: 0;
   background: linear-gradient(var(--bg-gradient), var(--bg-gradient)),
               url('../img/Regional.png') repeat-x top;
   background-size: cover;
-  background-position: top center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  text-align: center;
+  background-position: 0 top;
   animation: slideBackground 60s linear infinite;
-  overflow: hidden; /* evita desbordes */
+  z-index: -1;
 }
 
+/* Animación horizontal */
+@keyframes slideBackground {
+  0%   { background-position: 0 top; }
+  100% { background-position: 100% top; }
+}
+
+/* ============================== */
+/* 3. Contenido */
+/* ============================== */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 3rem;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  max-width: 450px;
+  margin: 2rem auto;
+  padding: 10px;
+  color: #3c3c3b;
+  background: rgba(255,255,255,0);
+  border-radius: 6px;
+}
 
 
 /* Overlay semitransparente */
@@ -51,21 +75,7 @@ html, body {
   pointer-events: none;
 }
 
-/* Animación horizontal del fondo */
-@keyframes slideBackground {
-  0%   { background-position: 0 top; }
-  100% { background-position: 100% top; }
-}
 
-/* Contenido centrado */
-.content {
-  position: relative;
-  z-index: 1;
-  max-width: 450px;
-  max-height: 90vh; /* nunca más grande que la pantalla */
-  padding: 10px;
-  overflow: auto;   /* scroll interno si el texto es demasiado */
-}
 
 @media (max-width: 767px) {
   .content {
@@ -328,7 +338,9 @@ footer {
 
 .content h1 {
     font-size: 1.2em;
-    line-height: 0;
+    line-height: 1;
+    text-align: center;
+    margin-top: 20px;
 }
 
 .notification.is-info {
@@ -337,4 +349,27 @@ footer {
     margin-bottom: 10px;
     margin-top: 20px;
     padding: 10px;
+    text-align: center;
+}
+
+.scroll-wrapper {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  overflow-y: auto; /* scroll visible al lado derecho */
+  overflow-x: hidden;
+}
+
+.button.is-primary {
+  background-color: #00d1b2;
+  border-color: transparent;
+  color: #fff;
+  display: block;
+  margin-left: auto;
+}
+
+.notification.is-success {
+    background-color: #48c78e;
+    color: #fff;
+    text-align: center;
 }

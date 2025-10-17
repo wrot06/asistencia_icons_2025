@@ -11,7 +11,7 @@ export async function getSessions() {
 
 
 export async function registerAttendee(data) {
-  // Ya los nombres vienen correctos desde el formulario
+  // Incluir los tres campos nuevos
   const payload = {
     full_name: data.full_name,
     document_type: data.document_type,
@@ -19,6 +19,9 @@ export async function registerAttendee(data) {
     email: data.email,
     phone: data.phone,
     gender: data.gender,
+    organizacion: data.organizacion,            // <--- agregado
+    ocupacion: data.ocupacion,                  // <--- agregado
+    ciudad_de_procedencia: data.ciudad_de_procedencia, // <--- agregado
     session_id: data.session_id,
   };
 
@@ -40,5 +43,6 @@ export async function registerAttendee(data) {
 
   return JSON.parse(text);
 }
+
 
 

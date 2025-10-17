@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Asistencia - Evento</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+<link rel="stylesheet" href="css/asistencia.css">
+ 
+</head>
+<body>
+  <section class="hero"> <!-- Contenedor que activa el fondo animado -->
+    <div class="content">
+      <h1 class="title has-text-centered">Registro de Asistencia</h1>
+      <div id="formulario"></div>
+    </div>
+  </section>
+
+  <script>
+    // ---- CONFIGURACIÓN ----
+    // Formatos: YYYY-MM-DD
+    const formularios = [
+      
+      // Día 1 (Miércoles)
+      { fecha: '2025-10-22', jornada: 'mañana', inicio: '08:00', fin: '12:00', iframe: `<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfSb1aSmM_2Xzwzx1mNaB2KV2dCtRltdk5EEvzJYVsqGyO_Mw/viewform?embedded=true" width="640" height="2093" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>` },
+      { fecha: '2025-10-22', jornada: 'tarde', inicio: '14:00', fin: '19:00', iframe: `<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdZu5W5osbsUMTzDaEYM6HG_tdAI8RQvf9dC8WssxFoMkEPQQ/viewform?embedded=true" width="700" height="520" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>` },
+      // Día 2 (Jueves)
+      { fecha: '2025-10-23', jornada: 'mañana', inicio: '08:00', fin: '12:00', iframe: `<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScqmeRwqxcn-YvDU4qE7_cmve7GlpZXWu4pXHZQ-VkJhT-R5Q/viewform?embedded=true" width="640" height="2100" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>` },
+      { fecha: '2025-10-23', jornada: 'tarde', inicio: '14:00', fin: '19:00', iframe: `<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdkdOEEyeQTFvxnB3bK9O0kTZE4Khm0hkFYtwNCGDuzRlWjJA/viewform?embedded=true" width="640" height="2071" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>` },
+      // Día 3 (Viernes)
+      { fecha: '2025-10-24', jornada: 'mañana', inicio: '08:00', fin: '12:00', iframe: `<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfczUjHDXkRB93GFFiGZo_ONja6P8Wih-t_OGm7CMDRP7d1NA/viewform?embedded=true" width="640" height="2071" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>` },
+      { fecha: '2025-10-24', jornada: 'tarde', inicio: '14:00', fin: '19:00', iframe: `<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeqMhbIm_XkuCxZWv24prw3I2rCCvA1zWsuPwg3p2QBngGi3A/viewform?embedded=true" width="640" height="2071" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>` }
+    ];
+
+    // ---- LÓGICA ----
+    const zonaHoraria = 'America/Bogota'; // Hora Colombia
+    const ahora = new Date();
+    const ahoraCol = new Date(ahora.toLocaleString('en-US', { timeZone: zonaHoraria }));
+
+    const fechaActual = ahoraCol.toISOString().slice(0,10);
+    const horaActual = ahoraCol.getHours() + (ahoraCol.getMinutes()/60);
+
+    const actual = formularios.find(f => {
+      if (f.fecha !== fechaActual) return false;
+      const [hi, mi] = f.inicio.split(':').map(Number);
+      const [hf, mf] = f.fin.split(':').map(Number);
+      const inicio = hi + mi/60;
+      const fin = hf + mf/60;
+      return horaActual >= inicio && horaActual <= fin;
+    });
+
+    const contenedor = document.getElementById('formulario');
+
+    if (actual) {
+      contenedor.innerHTML = `
+        <div class="box">          
+          ${actual.iframe}
+        </div>`;
+    } else {
+      contenedor.innerHTML = `
+        <div class="message box">
+          <h2 class="subtitle">No hay formularios activos en este momento.</h2>
+          <p>Por favor, regresa en el horario correspondiente a tu jornada.</p>
+        </div>`;
+    }
+  </script>
+</body>
+</html>

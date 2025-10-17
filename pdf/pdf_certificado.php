@@ -56,7 +56,7 @@ try {
 
 // 🔹 URL de verificación (incluye el token)
 $urlVerificacion = "https://ciesju.udenar.edu.co/app/icons2025/certificar.html?ip=" . urlencode($id_ponencia) . "&tok=" . urlencode($token_b64url);
-
+$textoVisible = "Verificar autenticidad";
 // 🔹 Generar QR usando tu API
 $qrApiUrl = "https://ciesju.udenar.edu.co/qr-api/generate-qr/?data=" . urlencode($urlVerificacion);
 $imageString = @file_get_contents($qrApiUrl);
@@ -68,63 +68,54 @@ $imageData = 'data://image/png;base64,' . base64_encode($imageString);
 class PDF extends FPDF {
     public $qrData;
     function __construct($qrData) {
-        parent::__construct();
+        parent::__construct('L', 'mm', 'Letter');
         $this->qrData = $qrData;
     }
-    function Footer() {
-        global $urlVerificacion;
-        $this->SetY(-25);
-        $this->SetFont('Arial', 'I', 9);
-        $this->SetTextColor(80);
-        $this->Cell(0, 5, utf8_decode("Verifique este certificado en:"), 0, 1, 'L');
-        $this->SetTextColor(0, 0, 200);
-        $this->Cell(0, 5, $urlVerificacion, 0, 0, 'L');
+    function Header() {
+        $this->Image('../img/CERTIFICADO_PONENTE.jpg', 0, 0, 279.4, 215.9); // CORRECTO
     }
+
 }
 
 $pdf = new PDF($imageData);
 $pdf->AddPage();
 $pdf->SetMargins(25, 25, 25);
 $pdf->SetAutoPageBreak(true, 35);
+$pdf->SetTitle(utf8_decode("CERTIFICACIÓN ($nombre) IconS 2025 - Universidad de Nariño"));
 $pdf->SetFont('Times', '', 14);
 
-// Logo
-$logoPath = __DIR__ . '/logo_udenar.png';
-if (file_exists($logoPath)) $pdf->Image($logoPath, 80, 10, 50);
-$pdf->Ln(40);
+// Nombre del asistente
+$pdf->AddFont('Touche-Regular-BF642a2ebfe9ff0','',"Touche-Regular-BF642a2ebfe9ff0.php");
+$pdf->SetFont('Touche-Regular-BF642a2ebfe9ff0','',28);
+$pdf->SetTextColor(29,29,27);
+$pdf->SetXY(0,85);
+$pdf->Cell(279.4,10,utf8_decode($nombre),0,1,'C');
 
-// Título
-$pdf->SetFont('Times', 'B', 18);
-$pdf->Cell(0, 10, utf8_decode('CERTIFICACIÓN'), 0, 1, 'C');
-$pdf->Ln(10);
 
-// Texto
-$pdf->SetFont('Times', '', 12);
-$texto = "El Centro de Investigaciones y Estudios Socio-Jurídicos (CIESJU) de la Universidad de Nariño hace constar que 
-$nombre participó en el VII Seminario Nacional ICON-S 'Democracia, Derechos Humanos e Inteligencia Artificial', 
-con la ponencia titulada: '" . ($p['titulo_ponencia'] ?: 'Sin título registrado') . "'. 
-Este evento académico se realizó los días 22, 23 y 24 de octubre de 2025, con una intensidad de 30 horas académicas, 
-en las instalaciones de la Universidad de Nariño, en la ciudad de Pasto, República de Colombia.
+// 🔹 Coordenadas manuales (posición del texto)
+$pdf->SetXY(18, 55); // X = 50mm, Y = 130mm
+// 🔹 Cambiar color del texto (RGB)
+$pdf->SetTextColor(143, 188, 190); // Rojo
+// Ejemplo: (0,0,255)=azul, (0,0,0)=negro, (255,0,0)=rojo, (0,128,0)=verde
+// 🔹 Fuente personalizada
+$pdf->AddFont('Touche-Regular-BF642a2ebfe9ff0','',"Touche-Regular-BF642a2ebfe9ff0.php");
+$pdf->SetFont('Touche-Regular-BF642a2ebfe9ff0','',9);
+// 🔹 Texto visible
+$textoVisible = "Verificar autenticidad";
+// 🔹 Mostrar texto con enlace (clickeable)
+$pdf->Write(6, $textoVisible, $urlVerificacion);
+// 🔹 Volver al color normal (negro)
+$pdf->SetTextColor(0, 0, 0);
 
-En constancia de lo anterior, se firma en San Juan de Pasto, $fecha.";
 
-$pdf->MultiCell(0, 8, utf8_decode($texto));
-$pdf->Ln(15);
 
-// Firmas
-$pdf->SetFont('Times', 'B', 12);
-$pdf->Cell(95, 8, utf8_decode('LEONARDO A. ENRÍQUEZ MARTÍNEZ'), 0, 0, 'C');
-$pdf->Cell(95, 8, utf8_decode('CRISTHIAN ALEXANDER PEREIRA OTERO'), 0, 1, 'C');
-$pdf->SetFont('Times', '', 12);
-$pdf->Cell(95, 8, utf8_decode('Decano - Facultad de Derecho y Ciencias Políticas'), 0, 0, 'C');
-$pdf->Cell(95, 8, utf8_decode('Director - CIESJU Universidad de Nariño'), 0, 1, 'C');
-$pdf->Ln(20);
+
 
 // QR
-$pdf->Image($pdf->qrData, 160, 230, 35, 35, 'PNG');
+$pdf->Image($pdf->qrData, 16, 16, 40, 40, 'PNG');
 
 // Salida
-$nombreArchivo = "Certificado_ICON-S_2025_" . preg_replace('/[^A-Za-z0-9_\-]/', '_', $nombre) . ".pdf";
+$nombreArchivo = "Certificado ICON-S2025 (" . utf8_decode ( $nombre) . ").pdf";
 $pdf->Output("I", $nombreArchivo);
 exit;
 ?>

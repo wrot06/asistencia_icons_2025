@@ -107,7 +107,7 @@ $stmt = $conec->prepare("
             <p class="certificate-text">
               <?php
               echo "El Centro de Investigaciones y Estudios Socio-Jurídicos (CIESJU) de la Universidad de Nariño hace constar que <strong>" .
-                   htmlspecialchars($datos['full_name'], ENT_QUOTES, 'UTF-8') . "</strong>, identificado(a) con " . 
+                   htmlspecialchars($datos['full_name'], ENT_QUOTES, 'UTF-8') . "</strong>, quien se identifica con " . 
                    $larguito . htmlspecialchars($datos['document_number'], ENT_QUOTES, 'UTF-8') .
                    ", asistió al <em>VII Seminario Nacional IconS 'Democracia, Derechos Humanos e Inteligencia Artificial'</em> en calidad de " . $role .
                    ", realizado los días 22, 23 y 24 de octubre de 2025, con una intensidad

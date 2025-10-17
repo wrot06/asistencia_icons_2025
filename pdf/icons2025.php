@@ -57,7 +57,11 @@ $calidadTexto = $rol;
 // ---------------------------------------------------
 // Generar QR usando la API externa
 // ---------------------------------------------------
-$urlVerificacion = "https://ciesju.udenar.edu.co/app/icons2025/certificar.html?ip=" . urlencode($cedula) . "&rol=" . urlencode($rol);
+// 🔹 URL de verificación (incluye el token)
+
+$urlVerificacion = "https://ciesju.udenar.edu.co/app/icons2025/icons2025.php?identificacion=" . urlencode($cedula);
+$textoVisible = "Verificar autenticidad";
+
 $qrApiUrl = "https://ciesju.udenar.edu.co/qr-api/generate-qr/?data=" . urlencode($urlVerificacion);
 
 $imageString = @file_get_contents($qrApiUrl);
@@ -74,7 +78,7 @@ class PDF extends FPDF {
         $this->qrData = $qrData;
     }
     function Header() {
-        $this->Image('../../img/diplomaFondo2.jpg', 0, 0, 279.4, 215.9); // CORRECTO
+        $this->Image('../img/CERTIFICADO_ASISTENTE.jpg', 0, 0, 279.4, 215.9); // CORRECTO
     }
 }
 
@@ -89,34 +93,42 @@ $pdf->SetTitle(utf8_decode("CERTIFICACIÓN ($cedula) IconS 2025 - Universidad de
 $pdf->AddPage();
 
 // Nombre del asistente
-$pdf->SetFont('Arial','B',28);
+$pdf->AddFont('Touche-Regular-BF642a2ebfe9ff0','',"Touche-Regular-BF642a2ebfe9ff0.php");
+$pdf->SetFont('Touche-Regular-BF642a2ebfe9ff0','',28);
 $pdf->SetTextColor(29,29,27);
-$pdf->SetXY(0,80);
+$pdf->SetXY(0,85);
 $pdf->Cell(279.4,10,utf8_decode($nombre),0,1,'C');
 
 // Documento de identificación
-$pdf->SetFont('Arial','',12);
+$pdf->AddFont('Touche-Regular-BF642a2ebfe9ff0','',"Touche-Regular-BF642a2ebfe9ff0.php");
+$pdf->SetFont('Touche-Regular-BF642a2ebfe9ff0','',12);
 $pdf->SetTextColor(87,87,86);
-$pdf->SetXY(0,95);
-$pdf->Cell(279.4,10,utf8_decode("Identificado(a) con $docTipoLargo"),0,1,'C');
+$pdf->SetXY(0,93.5);
+$pdf->Cell(279.4,10,utf8_decode("Quien se identifica con $docTipoLargo"),0,1,'C');
 
-// Participación
-$pdf->SetTextColor(32,57,106);
-$pdf->SetXY(0,110);
-$pdf->Cell(279.4,10,utf8_decode("Participó en calidad de $calidadTexto en el"),0,1,'C');
 
-// Firma y QR
-$pdf->SetTextColor(0,0,0);
-$pdf->SetFont('Arial','B',12);
-$pdf->SetXY(0, 170);
-$pdf->Cell(140,10,utf8_decode("LEONARDO A. ENRÍQUEZ MARTÍNEZ\nDecano - Facultad de Derecho y Ciencias Políticas"),0,0,'C');
-$pdf->Cell(140,10,utf8_decode("CRISTHIAN ALEXANDER PEREIRA OTERO\nDirector - CIESJU Universidad de Nariño"),0,1,'C');
 
-$pdf->Image($imageData, 220, 20, 35, 35, 'PNG');
+// 🔹 Coordenadas manuales (posición del texto)
+$pdf->SetXY(18, 55); // X = 50mm, Y = 130mm
+// 🔹 Cambiar color del texto (RGB)
+$pdf->SetTextColor(143, 188, 190); // Rojo
+// Ejemplo: (0,0,255)=azul, (0,0,0)=negro, (255,0,0)=rojo, (0,128,0)=verde
+// 🔹 Fuente personalizada
+$pdf->AddFont('Touche-Regular-BF642a2ebfe9ff0','',"Touche-Regular-BF642a2ebfe9ff0.php");
+$pdf->SetFont('Touche-Regular-BF642a2ebfe9ff0','',9);
+// 🔹 Texto visible
+$textoVisible = "Verificar autenticidad";
+// 🔹 Mostrar texto con enlace (clickeable)
+$pdf->Write(6, $textoVisible, $urlVerificacion);
+// 🔹 Volver al color normal (negro)
+$pdf->SetTextColor(0, 0, 0);
+
+
+$pdf->Image($imageData, 16, 16, 40, 40, 'PNG');
 
 // ---------------------------------------------------
 // Salida PDF
 // ---------------------------------------------------
-$pdf->Output("I", "Certificado_ICON-S_2025_$cedula.pdf");
+$pdf->Output("I", "Certificado ICON-S 2025 ($cedula) - UDENAR.pdf");
 exit();
 ?>
