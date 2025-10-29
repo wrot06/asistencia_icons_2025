@@ -59,6 +59,30 @@
           const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
           const fechaLarga = fecha.toLocaleDateString('es-CO', opciones);
 
+        // ✅ Inicializamos firma fuera del if
+        let firma = '';
+        let firma2 = '';
+
+        if (p.id != 273) {
+          firma = `
+            <div class="firma">
+              <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>
+              Copresidente<br>ICON-S Colombia</p>
+            </div>`;
+        }
+
+        if (p.id != 265) {
+          firma2 = `
+              <div class="firma">
+                <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>Director<br>Centro de Investigación y Estudios Socio-Jurídicos</p>    
+              </div>`;
+        }else{
+          firma2 = `
+              <div class="firma">
+                <strong><p>LEONARDO A. ENRÍQUEZ MARTÍNEZ<br></strong>Decano<br>Facultad de Derecho y Ciencias Políticas</p>    
+              </div>`;
+        }
+
           const textoCertificado = `
             <p class="certificate-text">
               La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
@@ -73,13 +97,8 @@
             <p class="certificate-text">En constancia de lo anterior, se firma en San Juan de Pasto, ${fechaLarga}.</p>
 
 <div class="firmas-container">
-  <div class="firma">
-    <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>Copresidente<br>ICON-S Colombia</p>    
-  </div>
-
-  <div class="firma">
-    <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>Director<br>Centro de Investigación y Estudios Socio-Jurídicos</p>    
-  </div>
+  ${firma}
+  ${firma2}
 </div>
 
           `;

@@ -67,17 +67,28 @@ $imageData = 'data://image/png;base64,' . base64_encode($imageString);
 // 🧾 Crear el PDF
 class PDF extends FPDF {
     public $qrData;
-    function __construct($qrData) {
+    public $id_ponencia;
+
+    function __construct($qrData, $id_ponencia) {
         parent::__construct('L', 'mm', 'Letter');
         $this->qrData = $qrData;
-    }
-    function Header() {
-        $this->Image('../img/CERTIFICADO_PONENTE.jpg', 0, 0, 279.4, 215.9); // CORRECTO
+        $this->id_ponencia = $id_ponencia;
     }
 
+    function Header() {
+        if ($this->id_ponencia == 273) {
+            $this->Image('../img/CERTIFICADO_PONENTE_M.jpg', 0, 0, 279.4, 215.9);
+        } elseif($this->id_ponencia == 265) {
+            $this->Image('../img/CERTIFICADO_PONENTE_MD.jpg', 0, 0, 279.4, 215.9);
+        }
+        else {
+            $this->Image('../img/CERTIFICADO_PONENTE.jpg', 0, 0, 279.4, 215.9);
+        }
+    }
 }
 
-$pdf = new PDF($imageData);
+// Instancia del PDF
+$pdf = new PDF($imageData, $id_ponencia);
 $pdf->AddPage();
 $pdf->SetMargins(25, 25, 25);
 $pdf->SetAutoPageBreak(true, 35);
