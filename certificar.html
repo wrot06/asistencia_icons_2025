@@ -54,15 +54,16 @@
           const listaAutores = formatearAutores(p.nombre_apellido, [...coautores]);
           const totalAutores = 1 + coautores.length;
           const verboParticipar = totalAutores > 1 ? "participaron" : "participó";
+          const verboPonentes = totalAutores > 1 ? "ponentes" : "ponente";
           const fecha = new Date();
           const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
           const fechaLarga = fecha.toLocaleDateString('es-CO', opciones);
 
           const textoCertificado = `
             <p class="certificate-text">
-              El <strong>Centro de Investigaciones y Estudios Socio-Jurídicos (CIESJU)</strong> de la Universidad de Nariño hace constar que 
-              <strong>${listaAutores}</strong> ${verboParticipar} en el 
-              <strong>VII Seminario Nacional ICON-S</strong> 
+              La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
+              Certifican que:
+              <strong>${listaAutores}</strong> ${verboParticipar} en calidad de ${verboPonentes} en el <strong>VII Seminario Internacional de Derecho Público ICON- S Colombia</strong> 
               <em>"Democracia, Derechos Humanos e Inteligencia Artificial"</em>,
               con su ponencia titulada: <strong>${p.titulo_ponencia || "Sin título registrado"}</strong>.
               Este evento académico se realizó los días <strong>22, 23 y 24 de octubre de 2025</strong>,
@@ -73,7 +74,7 @@
 
 <div class="firmas-container">
   <div class="firma">
-    <strong><p>LEONARDO A. ENRÍQUEZ MARTÍNEZ<br></strong>Decano<br>Facultad de Derecho y Ciencias Políticas</p>    
+    <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>Copresidente<br>ICON-S Colombia</p>    
   </div>
 
   <div class="firma">

@@ -19,7 +19,7 @@ function renderTemplate($title, $content) {
       <!-- FOOTER: Slider de patrocinadores y firma del desarrollador -->
       <footer>        
         <div class="developer-role">         
-          <img src="img/Proyecto.png" style="width: 80px;">
+          <img src="img/Proyecto.png" style="width: 120px;">
         </div>
       </footer>
       <!-- Carga única del JavaScript; la ruta es relativa a /app -->
@@ -106,7 +106,8 @@ $stmt = $conec->prepare("
             <h4 class="certificate-title mb-4"><strong>CERTIFICACIÓN</strong></h4>
             <p class="certificate-text">
               <?php
-              echo "El Centro de Investigaciones y Estudios Socio-Jurídicos (CIESJU) de la Universidad de Nariño hace constar que <strong>" .
+              echo "La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
+Certifican que: <strong>" .
                    htmlspecialchars($datos['full_name'], ENT_QUOTES, 'UTF-8') . "</strong>, quien se identifica con " . 
                    $larguito . htmlspecialchars($datos['document_number'], ENT_QUOTES, 'UTF-8') .
                    ", asistió al <em>VII Seminario Nacional IconS 'Democracia, Derechos Humanos e Inteligencia Artificial'</em> en calidad de " . $role .
@@ -119,10 +120,9 @@ $stmt = $conec->prepare("
               <?php echo "En constancia de lo anterior, se firma en San Juan de Pasto, $dia de $mesLargo de $ano."; ?>
             </p>
             <p class="certificate-text">
-              <strong>LEONARDO A. ENRÍQUEZ MARTÍNEZ</strong><br>
-              Decano<br>
-              Facultad de Derecho y Ciencias Políticas<br>
-              Universidad de Nariño
+              <strong>MILTON CÉSAR JIMENEZ RAMÍREZ</strong><br>
+              Copresidente<br>
+              ICON-S Colombia
             </p>
             <p class="certificate-text">
               <strong>CRISTHIAN ALEXANDER PEREIRA OTERO</strong><br>
@@ -189,12 +189,8 @@ ob_start();
         <p class="info-text" style="font-size: 11px; margin-top: -5px; margin-bottom: 8px;">
           Para generar tu certificado digital, ingresa tu<br>número de identificación y haz clic en "Consultar".
         </p>
-        <input type="text" name="identificacion" id="identificacion" 
-               class="numeric-input" placeholder="" 
-               style="display: block; margin: 0 auto 10px auto; text-align: center;" 
-               pattern="\d+">
-        <button type="submit" class="generate-btn" id="generarCertificado" 
-                style="display: block; margin: 0 auto; width: 200px;">
+        <input type="text" name="identificacion" id="identificacion" class="numeric-input" placeholder="" style="display: block; margin: 0 auto 10px auto; text-align: center;" pattern="\d+">
+        <button type="submit" class="generate-btn" id="generarCertificado" style="display: block; margin: 0 auto; width: 200px;">
           Consultar
         </button>
       </form>
