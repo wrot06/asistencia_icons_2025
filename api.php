@@ -114,6 +114,35 @@ function obtenerPonenciaPorId($id) {
     return $ponencia;
 }
 
+// 📋 Obtener todos los paneles
+function obtenerPaneles() {
+    $pdo = conectarDB();
+    $sql = "SELECT id, no, moderador FROM panel ORDER BY id ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// 🧾 Obtener un panel por su ID
+function obtenerPanelPorId($id) {
+    $pdo = conectarDB();
+    $sql = "SELECT id, no, moderador FROM panel WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// 🔍 Buscar paneles por término (moderador o título/no)
+function buscarPaneles($termino) {
+    $pdo = conectarDB();
+    $sql = "SELECT id, no, moderador FROM panel WHERE moderador LIKE ? OR no LIKE ? ORDER BY id ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(["%$termino%", "%$termino%"]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
 // 🔄 Controlador principal
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
@@ -158,6 +187,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 echo json_encode(['error' => 'Ponencia no encontrada']);
             }
+            break;
+
+        case 'ver_panel':
+            $resultados = obtenerPaneles();
+            echo json_encode(['success' => true, 'data' => $resultados]);
+            break;
+        
+        case 'ver_detalle_panel':
+            $id = $_POST['id'] ?? 0;
+            if (empty($id)) {
+                echo json_encode(['error' => 'Debe indicar el ID del panel']);
+                exit;
+            }
+
+            $panel = obtenerPanelPorId($id);
+            if ($panel) {
+                echo json_encode(['success' => true, 'data' => $panel]);
+            } else {
+                echo json_encode(['error' => 'Panel no encontrado']);
+            }
+            break;
+        
+        case 'buscar_panel':
+            $termino = trim($_POST['termino'] ?? '');
+            if ($termino === '') {
+                echo json_encode(['success' => true, 'data' => []]); // o error si prefieres
+                break;
+            }
+            $resultados = buscarPaneles($termino);
+            echo json_encode(['success' => true, 'data' => $resultados]);
             break;
 
         default:

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Certificación Ponencia</title>
+  <title>Certificación Ponencia / Panel</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <link rel="stylesheet" href="css/certificar.css">
 </head>
@@ -14,7 +14,7 @@
       <div class="certificate-container">
         <h1 class="certificate-title">CERTIFICACIÓN</h1>
         <div id="contenido">
-          <p>Cargando información de la ponencia...</p>
+          <p>Cargando información...</p>
         </div>
 
         <div class="buttons is-right">
@@ -24,19 +24,23 @@
     </div>
   </section>
 
-  <!-- FontAwesome -->
-
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
   <script>
     const params = new URLSearchParams(window.location.search);
-    const id = params.get("ip");
+    const idPonencia = params.get("ip");   // 🔹 Para ponencias
+    const idPanel = params.get("ip2");     // 🔹 Para paneles
 
-    if (!id) {
-      document.getElementById("contenido").innerHTML = "<p>No se especificó ninguna ponencia.</p>";
-    } else {
+    if (!idPonencia && !idPanel) {
+      document.getElementById("contenido").innerHTML = "<p>No se especificó ningún elemento para certificar.</p>";
+    } 
+    else if (idPonencia) {
+      // ==================================================
+      // 🔹 CERTIFICADO DE PONENCIA
+      // ==================================================
       fetch("api.php", {
         method: "POST",
-        body: new URLSearchParams({ action: "ver_detalle", id })
+        body: new URLSearchParams({ action: "ver_detalle", id: idPonencia })
       })
       .then(res => res.json())
       .then(data => {
@@ -55,33 +59,32 @@
           const totalAutores = 1 + coautores.length;
           const verboParticipar = totalAutores > 1 ? "participaron" : "participó";
           const verboPonentes = totalAutores > 1 ? "ponentes" : "ponente";
-          const fecha = new Date();
-          const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
-          const fechaLarga = fecha.toLocaleDateString('es-CO', opciones);
+          const fecha = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
 
-        // ✅ Inicializamos firma fuera del if
-        let firma = '';
-        let firma2 = '';
+          let firma = '';
+          let firma2 = '';
 
-        if (p.id != 273) {
-          firma = `
-            <div class="firma">
-              <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>
-              Copresidente<br>ICON-S Colombia</p>
-            </div>`;
-        }
-
-        if (p.id != 265) {
-          firma2 = `
+          if (p.id != 273) {
+            firma = `
               <div class="firma">
-                <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>Director<br>Centro de Investigación y Estudios Socio-Jurídicos</p>    
+                <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>
+                Copresidente<br>ICON-S Colombia</p>
               </div>`;
-        }else{
-          firma2 = `
-              <div class="firma">
-                <strong><p>LEONARDO A. ENRÍQUEZ MARTÍNEZ<br></strong>Decano<br>Facultad de Derecho y Ciencias Políticas</p>    
-              </div>`;
-        }
+          }
+
+          if (p.id != 265) {
+            firma2 = `
+                <div class="firma">
+                  <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>
+                  Director<br>Centro de Investigación y Estudios Socio-Jurídicos</p>    
+                </div>`;
+          } else {
+            firma2 = `
+                <div class="firma">
+                  <strong><p>LEONARDO A. ENRÍQUEZ MARTÍNEZ<br></strong>
+                  Decano<br>Facultad de Derecho y Ciencias Políticas</p>    
+                </div>`;
+          }
 
           const textoCertificado = `
             <p class="certificate-text">
@@ -91,16 +94,12 @@
               <em>"Democracia, Derechos Humanos e Inteligencia Artificial"</em>,
               con su ponencia titulada: <strong>${p.titulo_ponencia || "Sin título registrado"}</strong>.
               Este evento académico se realizó los días <strong>22, 23 y 24 de octubre de 2025</strong>,
-              con una intensidad de <strong>30 horas académicas</strong>, el cual se desarrolló en las instalaciones de la Universidad de Nariño,
-              en la ciudad de Pasto, República de Colombia.
+              con una intensidad de <strong>30 horas académicas</strong>, en la Universidad de Nariño,
+              en San Juan de Pasto, Colombia.
             </p>
-            <p class="certificate-text">En constancia de lo anterior, se firma en San Juan de Pasto, ${fechaLarga}.</p>
+            <p class="certificate-text">En constancia de lo anterior, se firma en San Juan de Pasto, ${fecha}.</p>
 
-<div class="firmas-container">
-  ${firma}
-  ${firma2}
-</div>
-
+            <div class="firmas-container">${firma}${firma2}</div>
           `;
 
           let botones = `<div class="has-text-centered">`;
@@ -111,8 +110,7 @@
               <button class="button autor-btn" type="submit">
                 Certificado: ${p.nombre_apellido}
               </button>
-            </form>
-          `;
+            </form>`;
           coautores.forEach(c => {
             botones += `
               <form method="POST" action="pdf/pdf_certificado.php" target="_blank">
@@ -121,8 +119,7 @@
                 <button class="button autor-btn" type="submit">
                   Certificado: ${c}
                 </button>
-              </form>
-            `;
+              </form>`;
           });
           botones += `</div>`;
 
@@ -131,9 +128,70 @@
           document.getElementById("contenido").innerHTML = `<p>${data.error}</p>`;
         }
       })
-      .catch(err => {
+      .catch(() => {
         document.getElementById("contenido").innerHTML = "<p>Error al cargar los datos de la ponencia.</p>";
-        console.error(err);
+      });
+    } 
+    else if (idPanel) {
+      // ==================================================
+      // 🔹 CERTIFICADO DE PANEL (tabla panel)
+      // ==================================================
+      fetch("api.php", {
+        method: "POST",
+        body: new URLSearchParams({ action: "ver_detalle_panel", id: idPanel })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const p = data.data;
+          const fecha = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+          let nombrePanel = (p.no || '').replace(/^.*?:\s*/, '');
+
+          const textoCertificado = `
+            <p class="certificate-text">
+              La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
+              Certifican que:
+              <strong>${p.moderador}</strong> participó como <strong>moderador</strong> del panel <strong>${nombrePanel}</strong> 
+              en el <strong>VII Seminario Internacional de Derecho Público ICON- S Colombia</strong>
+              <em>"Democracia, Derechos Humanos e Inteligencia Artificial"</em>,
+              realizado los días <strong>22, 23 y 24 de octubre de 2025</strong>
+              en la Universidad de Nariño, San Juan de Pasto, Colombia.
+            </p>
+            <p class="certificate-text">En constancia de lo anterior, se firma en San Juan de Pasto, ${fecha}.</p>
+
+            <div class="firmas-container">
+              <div class="firma">
+                <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>
+                Copresidente<br>ICON-S Colombia</p>
+              </div>
+              <div class="firma">
+                <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>
+                Director<br>Centro de Investigación y Estudios Socio-Jurídicos</p>    
+              </div>
+            </div>
+          `;
+
+const boton = `
+  <div class="has-text-centered">
+    <form method="POST" action="pdf/pdf_certificado_panel.php" target="_blank">
+      <input type="hidden" name="id_panel" value="${p.id}">
+      <input type="hidden" name="moderador" value="${p.moderador}">
+      <input type="hidden" name="panel" value="${nombrePanel}">
+      <button class="button autor-btn" type="submit">
+        Certificado: ${p.moderador}
+      </button>
+    </form>
+  </div>`;
+
+
+
+          document.getElementById("contenido").innerHTML = textoCertificado + boton;
+        } else {
+          document.getElementById("contenido").innerHTML = `<p>${data.error}</p>`;
+        }
+      })
+      .catch(() => {
+        document.getElementById("contenido").innerHTML = "<p>Error al cargar los datos del panel.</p>";
       });
     }
   </script>

@@ -4,62 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ponencias - Congreso Universidad de Nariño</title>
-
-  <!-- Bulma y tema global -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <link rel="stylesheet" href="css/theme2025.css">
-  
 </head>
 
 <body>
-  <section class="hero"> <!-- 🔹 Fondo animado -->
+  <section class="hero">
     <div class="container container-ponencias">
-     
+      
+      <!-- 🔹 Encabezado -->
+      <div class="has-text-centered mb-5" style="margin-top: 60px;">
+        <h1 class="title is-3 has-text-weight-semibold has-text-white mb-4">
+          📚 Listado de Ponencias
+        </h1>
 
-<!-- 🔹 Encabezado con título y buscador -->
-<div class="has-text-centered mb-5" style="margin-top: 60px;">
-  <h1 class="title is-3 has-text-weight-semibold has-text-white mb-4">
-    📚 Listado de Ponencias
-  </h1>
+        <div class="field has-addons is-justify-content-center">
+          <div class="control is-expanded" style="max-width: 500px;">
+            <input 
+              type="text" 
+              id="termino" 
+              class="input is-medium" 
+              placeholder="Buscar ponencia o autor...">
+          </div>
+          <div class="control">
+            <button id="btnBuscar" class="button is-primary is-medium">
+              <span class="icon"><i class="fas fa-search"></i></span>
+              <span>Buscar</span>
+            </button>
+          </div>
+          <div class="control">
+            <button id="btnVerTodos" class="button is-info is-medium">Ver todos</button>
+          </div>
+        </div>
+      </div>
 
-  <div class="field has-addons is-justify-content-center">
-    <div class="control is-expanded" style="max-width: 500px;">
-      <input 
-        type="text" 
-        id="termino" 
-        class="input is-medium" 
-        placeholder="Buscar ponencia o autor...">
-    </div>
-    <div class="control">
-      <button id="btnBuscar" class="button is-primary is-medium">
-        <span class="icon"><i class="fas fa-search"></i></span>
-        <span>Buscar</span>
-      </button>
-    </div>
-  </div>
-</div>
+      <!-- 🔹 Tabla de ponencias -->
+      <div class="table-container mb-6">
+        <table class="table table-ponencias is-striped is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Autor(es)</th>
+              <th>Título</th>
+              <th>Certificado</th>
+            </tr>
+          </thead>
 
 
-
-      <div class="table-container">
-<table class="table table-ponencias is-striped is-hoverable is-fullwidth">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Autor(es)</th>
-      <th>Título</th>
-      <th>Certificado</th>
-    </tr>
-  </thead>
-  <tbody id="tablaDatos">
-    <tr>
-      <td colspan="4" class="has-text-centered has-text-grey-light">
-        No hay resultados para mostrar.
-      </td>
-    </tr>
-  </tbody>
-</table>
-
+        <tbody id="tablaDatos">
+          <tr>
+            <td colspan="4" class="has-text-centered has-text-grey-light">
+              No hay resultados para mostrar.
+            </td>
+          </tr>
+        </tbody>
+        </table>
       </div>
     </div>
 
@@ -68,18 +67,16 @@
     </footer>
   </section>
 
-  <!-- FontAwesome -->
-
-
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-  <!-- Lógica de búsqueda -->
+  <!-- 🔹 Lógica principal -->
 <script>
+  // 🔹 Renderiza ponencias
   function mostrarResultados(data) {
     let html = '';
     if (data.length === 0) {
-      html = `<tr><td colspan="4" class="has-text-centered has-text-grey">No se encontraron resultados.</td></tr>`;
+      html = `<tr><td colspan="4" class="has-text-centered has-text-grey">No se encontraron ponencias.</td></tr>`;
     } else {
       data.forEach((item, index) => {
         html += `
@@ -99,7 +96,59 @@
     $('#tablaDatos').html(html);
   }
 
-  // 🔹 Buscar manualmente
+  // 🔹 Renderiza paneles
+  function mostrarPaneles(data) {
+    let html = `
+      <tr class="has-background-light">
+        <td colspan="4" class="has-text-centered has-text-weight-semibold">
+          🎤 Moderadores
+        </td>
+      </tr>`;
+
+    if (data.length === 0) {
+      html += `<tr><td colspan="4" class="has-text-centered has-text-grey">No hay paneles registrados.</td></tr>`;
+    } else {
+      data.forEach(item2 => {
+        let nombrePanel = (item2.no || '').replace(/^.*?:\s*/, '');
+        html += `
+          <tr>
+            <td>${item2.id}</td>
+            <td>${item2.moderador}</td>
+            <td>${nombrePanel}</td>
+            <td>
+              <a href="certificar.html?ip2=${item2.id}" class="button is-link is-fullwidth is-small">
+                <span class="icon"><i class="fas fa-file-certificate"></i></span>
+                <span>Certificar</span>
+              </a>
+            </td>
+          </tr>`;
+      });
+    }
+    $('#tablaDatos').append(html);
+  }
+
+  // 🔹 Cargar todas las ponencias
+  function cargarPonencias() {
+    $.post('api.php', { action: 'ver_todas' }, function(res) {
+      if (res.success) {
+        mostrarResultados(res.data);
+        cargarPaneles(); // también muestra los paneles
+      } else {
+        $('#tablaDatos').html('<tr><td colspan="4" class="has-text-centered has-text-grey">Error al cargar los datos.</td></tr>');
+      }
+    }, 'json');
+  }
+
+  // 🔹 Cargar todos los paneles
+  function cargarPaneles() {
+    $.post('api.php', { action: 'ver_panel' }, function(res2) {
+      if (res2.success) {
+        mostrarPaneles(res2.data);
+      }
+    }, 'json');
+  }
+
+  // 🔹 Búsqueda manual (ponencias + paneles)
   $('#btnBuscar').on('click', function() {
     const termino = $('#termino').val().trim();
     if (!termino) {
@@ -107,26 +156,40 @@
       return;
     }
 
-    $.post('api.php', { action: 'buscar', termino }, function(res) {
-      if (res.success) {
-        mostrarResultados(res.data);
+    $('#tablaDatos').html('<tr><td colspan="4" class="has-text-centered">Buscando...</td></tr>');
+
+    // 1️⃣ Buscar ponencias
+    $.post('api.php', { action: 'buscar', termino }, function(res1) {
+      if (res1.success) {
+        mostrarResultados(res1.data);
       } else {
-        alert('No se encontraron resultados.');
+        $('#tablaDatos').html('<tr><td colspan="4" class="has-text-centered has-text-grey">No se encontraron ponencias.</td></tr>');
       }
+
+      // 2️⃣ Buscar paneles relacionados
+      $.post('api.php', { action: 'buscar_panel', termino }, function(res2) {
+        if (res2.success && res2.data.length > 0) {
+          mostrarPaneles(res2.data);
+        } else {
+          $('#tablaDatos').append('<tr><td colspan="4" class="has-text-centered has-text-grey">No se encontraron paneles.</td></tr>');
+        }
+      }, 'json');
     }, 'json');
   });
 
-  // 🔹 Cargar todas las ponencias automáticamente al inicio
+  // 🔹 Carga inicial
   $(document).ready(function() {
-    $.post('api.php', { action: 'ver_todas' }, function(res) {
-      if (res.success) {
-        mostrarResultados(res.data);
-      } else {
-        $('#tablaDatos').html('<tr><td colspan="4" class="has-text-centered has-text-grey">Error al cargar las ponencias.</td></tr>');
-      }
-    }, 'json');
+    cargarPonencias();
+  });
+
+  // 🔹 Botón "Ver todos"
+  document.getElementById("btnVerTodos").addEventListener("click", function () {
+    document.getElementById("termino").value = ""; // limpia el campo correcto
+    cargarPonencias(); // recarga todo sin refrescar la página
   });
 </script>
+
+
 
 </body>
 </html>
