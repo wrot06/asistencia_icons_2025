@@ -26,12 +26,12 @@ try {
 }
 
 // 🔹 Parámetros recibidos
-$id_ponencia = $_POST['id_panel'] ?? 0;
-$nombre = trim($_POST['moderador'] ?? '');
+$id_ponencia = $_POST['id_ponencia'] ?? 0;
+$nombre = trim($_POST['nombre'] ?? '');
 if (!$id_ponencia || !$nombre) die("Faltan datos del autor o ID de ponencia.");
 
 // 🔹 Obtener datos de la ponencia
-$stmt = $pdo->prepare("SELECT * FROM panel WHERE id = ?");
+$stmt = $pdo->prepare("SELECT * FROM ponencias WHERE id = ?");
 $stmt->execute([$id_ponencia]);
 $p = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$p) die("Ponencia no encontrada.");

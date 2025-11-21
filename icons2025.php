@@ -30,9 +30,6 @@ function renderTemplate($title, $content) {
     exit;
 }
 
-
-
-
 if (filter_has_var(INPUT_GET, 'identificacion') && trim($_GET['identificacion']) !== '') {
     $idInput = trim(filter_input(INPUT_GET, 'identificacion', FILTER_SANITIZE_NUMBER_INT));
     if (!ctype_digit($idInput) || (int)$idInput < 0) exit("Número de identificación inválido.");

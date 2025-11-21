@@ -4,7 +4,9 @@ $username = "icons_user";
 $password = "Icons2025!";
 $database = "icons2025";
 
-// Función para conectar a la base de datos
+// =============================
+// 🔌 Conexión BD
+// =============================
 function conectarDB() {
     global $host, $username, $password, $database;
     try {
@@ -16,7 +18,11 @@ function conectarDB() {
     }
 }
 
-// 🔍 Buscar ponencias
+//
+// =========================================================
+//  🔹 PONENCIAS
+// =========================================================
+//
 function buscarPonencias($termino, $tipo = 'todo') {
     $pdo = conectarDB();
     $sql = "SELECT id, nombre_apellido, titulo_ponencia FROM ponencias WHERE 
@@ -49,39 +55,30 @@ function buscarPonencias($termino, $tipo = 'todo') {
     return $data;
 }
 
-
-// 📋 Obtener todas las ponencias
 function obtenerTodasPonencias() {
     $pdo = conectarDB();
-
-    // Obtener todas las ponencias
     $sql = "SELECT id, nombre_apellido, titulo_ponencia FROM ponencias ORDER BY nombre_apellido ASC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $ponencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Recorrer cada ponencia y añadir sus coautores
     foreach ($ponencias as &$p) {
         $sqlCoautores = "SELECT nombre FROM coautores WHERE id_ponencia = ?";
         $stmtC = $pdo->prepare($sqlCoautores);
         $stmtC->execute([$p['id']]);
         $coautores = $stmtC->fetchAll(PDO::FETCH_COLUMN);
 
-        // Combinar autor principal + coautores
         $todosAutores = [$p['nombre_apellido']];
         if (!empty($coautores)) {
             $todosAutores = array_merge($todosAutores, $coautores);
         }
 
-        // Crear campo 'autores' unificado
         $p['autores'] = implode(', ', $todosAutores);
     }
 
     return $ponencias;
 }
 
-
-// 🧩 Obtener ponencias por panel
 function obtenerPonenciasPorPanel($id_panel) {
     $pdo = conectarDB();
     $sql = "SELECT * FROM ponencias WHERE id_panel = ? ORDER BY nombre_apellido ASC";
@@ -90,11 +87,9 @@ function obtenerPonenciasPorPanel($id_panel) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// 🧾 Obtener una ponencia por su ID + coautores
 function obtenerPonenciaPorId($id) {
     $pdo = conectarDB();
 
-    // Obtener la ponencia
     $sql = "SELECT * FROM ponencias WHERE id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$id]);
@@ -102,19 +97,21 @@ function obtenerPonenciaPorId($id) {
 
     if (!$ponencia) return null;
 
-    // Obtener los coautores relacionados
     $sqlCoautores = "SELECT nombre FROM coautores WHERE id_ponencia = ?";
     $stmtCoautores = $pdo->prepare($sqlCoautores);
     $stmtCoautores->execute([$id]);
-    $coautores = $stmtCoautores->fetchAll(PDO::FETCH_COLUMN); // devuelve solo los nombres
+    $coautores = $stmtCoautores->fetchAll(PDO::FETCH_COLUMN);
 
-    // Añadir los coautores al arreglo
     $ponencia['coautores'] = $coautores;
 
     return $ponencia;
 }
 
-// 📋 Obtener todos los paneles
+//
+// =========================================================
+//  🔹 PANELES
+// =========================================================
+//
 function obtenerPaneles() {
     $pdo = conectarDB();
     $sql = "SELECT id, no, moderador FROM panel ORDER BY id ASC";
@@ -123,7 +120,6 @@ function obtenerPaneles() {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// 🧾 Obtener un panel por su ID
 function obtenerPanelPorId($id) {
     $pdo = conectarDB();
     $sql = "SELECT id, no, moderador FROM panel WHERE id = ?";
@@ -132,7 +128,6 @@ function obtenerPanelPorId($id) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// 🔍 Buscar paneles por término (moderador o título/no)
 function buscarPaneles($termino) {
     $pdo = conectarDB();
     $sql = "SELECT id, no, moderador FROM panel WHERE moderador LIKE ? OR no LIKE ? ORDER BY id ASC";
@@ -141,88 +136,225 @@ function buscarPaneles($termino) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+//
+// =========================================================
+//  🔹 LANZAMIENTOS
+// =========================================================
+//
+function obtenerLanzamientos() {
+    $pdo = conectarDB();
+    $sql = "SELECT id, moderador, titulo_libro FROM lanzamientos_libros ORDER BY id ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function buscarLanzamientos($termino) {
+    $pdo = conectarDB();
+    $sql = "SELECT id, moderador, titulo_libro 
+            FROM lanzamientos_libros 
+            WHERE moderador LIKE ? OR titulo_libro LIKE ?
+            ORDER BY id ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(["%$termino%", "%$termino%"]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function obtenerLanzamientoPorId($id) {
+    $pdo = conectarDB();
+    $sql = "SELECT id, moderador, titulo_libro 
+            FROM lanzamientos_libros
+            WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+//
+// =========================================================
+//  🔹 COMENTARISTAS (FALTABA TODO ESTO)
+// =========================================================
+//
+function obtenerComentaristas() {
+    $pdo = conectarDB();
+
+    $sql = "SELECT id, titulo_libro, comentaristas 
+            FROM lanzamientos_libros
+            ORDER BY titulo_libro ASC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $resultado = [];
+
+    foreach ($rows as $r) {
+
+        // Separar comentaristas por coma
+        $coms = array_map('trim', explode(',', $r['comentaristas']));
+
+        foreach ($coms as $nombre) {
+            if ($nombre === '') continue;
+
+            $resultado[] = [
+                'id'           => $r['id'],           // en tu orden
+                'comentarista' => $nombre,
+                'titulo_libro' => $r['titulo_libro']
+            ];
+        }
+    }
+
+    return $resultado;
+}
 
 
-// 🔄 Controlador principal
+
+function buscarComentaristas($termino) {
+    $pdo = conectarDB();
+    $sql = "SELECT id, comentarista, titulo_libro
+            FROM comentaristas_libros
+            WHERE comentarista LIKE ? OR titulo_libro LIKE ?
+            ORDER BY id ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(["%$termino%", "%$termino%"]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function obtenerComentaristaPorId($id) {
+    $pdo = conectarDB();
+    $sql = "SELECT id, comentarista, titulo_libro
+            FROM comentaristas_libros
+            WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function ver_detalle_comentarista($id) {
+    $pdo = conectarDB();
+
+    // 1. Buscar el lanzamiento
+    $sql = "SELECT id, titulo_libro, comentaristas 
+            FROM lanzamientos_libros
+            WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        return ['success' => false, 'error' => 'No encontrado'];
+    }
+
+    // 2. Separar comentaristas
+    $coms = array_map('trim', explode(',', $row['comentaristas']));
+
+    // Como no hay índice, tomamos SOLO EL PRIMERO
+    // (o si quieres manejar índice, te lo hago)
+    $primer_comentarista = $coms[0] ?? '';
+
+    return [
+        'success' => true,
+        'data' => [
+            'id' => $row['id'],
+            'comentarista' => $primer_comentarista,
+            'titulo_libro' => $row['titulo_libro']
+        ]
+    ];
+}
+
+
+//
+// =========================================================
+//  🔻 CONTROLADOR PRINCIPAL (POST)
+// =========================================================
+//
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
 
+        // 🔹 Ponencias
         case 'buscar':
             $termino = $_POST['termino'] ?? '';
-            if (empty($termino)) {
+            if ($termino === '') {
                 echo json_encode(['error' => 'Debe ingresar un término de búsqueda']);
-                exit;
+                break;
             }
-            $resultados = buscarPonencias($termino, 'todo');
-            echo json_encode(['success' => true, 'data' => $resultados]);
+            echo json_encode(['success' => true, 'data' => buscarPonencias($termino)]);
             break;
 
         case 'ver_todas':
-            $resultados = obtenerTodasPonencias();
-            echo json_encode(['success' => true, 'data' => $resultados]);
+            echo json_encode(['success' => true, 'data' => obtenerTodasPonencias()]);
             break;
 
         case 'por_panel':
             $id_panel = $_POST['id_panel'] ?? 0;
-            if (empty($id_panel)) {
+            if (!$id_panel) {
                 echo json_encode(['error' => 'Debe indicar el ID del panel']);
-                exit;
+                break;
             }
-            $resultados = obtenerPonenciasPorPanel($id_panel);
-            echo json_encode(['success' => true, 'data' => $resultados]);
+            echo json_encode(['success' => true, 'data' => obtenerPonenciasPorPanel($id_panel)]);
             break;
 
         case 'ver_detalle':
             $id = $_POST['id'] ?? 0;
-            if (empty($id)) {
-                echo json_encode(['error' => 'Debe indicar el ID de la ponencia']);
-                exit;
-            }
-            $ponencia = obtenerPonenciaPorId($id);
-            if ($ponencia) {
-                echo json_encode(['success' => true, 'data' => $ponencia]);
-            } else {
-                echo json_encode(['error' => 'Ponencia no encontrada']);
-            }
+            echo json_encode($id ? ['success' => true, 'data' => obtenerPonenciaPorId($id)] : ['error' => 'Debe indicar el ID']);
             break;
 
+        // 🔹 Paneles
         case 'ver_panel':
-            $resultados = obtenerPaneles();
-            echo json_encode(['success' => true, 'data' => $resultados]);
+            echo json_encode(['success' => true, 'data' => obtenerPaneles()]);
             break;
-        
+
         case 'ver_detalle_panel':
             $id = $_POST['id'] ?? 0;
-            if (empty($id)) {
-                echo json_encode(['error' => 'Debe indicar el ID del panel']);
-                exit;
-            }
-
-            $panel = obtenerPanelPorId($id);
-            if ($panel) {
-                echo json_encode(['success' => true, 'data' => $panel]);
-            } else {
-                echo json_encode(['error' => 'Panel no encontrado']);
-            }
+            echo json_encode($id ? ['success' => true, 'data' => obtenerPanelPorId($id)] : ['error' => 'Debe indicar el ID']);
             break;
-        
+
         case 'buscar_panel':
             $termino = trim($_POST['termino'] ?? '');
-            if ($termino === '') {
-                echo json_encode(['success' => true, 'data' => []]); // o error si prefieres
-                break;
-            }
-            $resultados = buscarPaneles($termino);
+            echo json_encode(['success' => true, 'data' => buscarPaneles($termino)]);
+            break;
+
+        // 🔹 Lanzamientos
+        case 'ver_lanzamientos':
+            echo json_encode(['success' => true, 'data' => obtenerLanzamientos()]);
+            break;
+
+        case 'buscar_lanzamientos':
+            $termino = trim($_POST['termino'] ?? '');
+            echo json_encode(['success' => true, 'data' => buscarLanzamientos($termino)]);
+            break;
+
+        case 'ver_detalle_lanzamiento':
+            $id = $_POST['id'] ?? 0;
+            echo json_encode($id ? ['success' => true, 'data' => obtenerLanzamientoPorId($id)] : ['error' => 'Debe indicar el ID']);
+            break;
+
+        // 🔹 Comentaristas (LOS QUE FALTABAN)
+        case 'ver_comentaristas':
+            $resultados = obtenerComentaristas();
             echo json_encode(['success' => true, 'data' => $resultados]);
             break;
 
+
+        case 'buscar_comentaristas':
+            $termino = trim($_POST['termino'] ?? '');
+            echo json_encode(['success' => true, 'data' => buscarComentaristas($termino)]);
+            break;
+
+        case "ver_detalle_comentarista":
+            echo json_encode(ver_detalle_comentarista($_POST['id']));
+            break;
+
+
+        // ❌ Acción desconocida
         default:
             echo json_encode(['error' => 'Acción no válida']);
             break;
     }
+
     exit;
 }
 ?>

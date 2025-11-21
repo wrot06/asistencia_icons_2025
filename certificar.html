@@ -26,174 +26,311 @@
 
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const idPonencia = params.get("ip");   // 🔹 Para ponencias
-    const idPanel = params.get("ip2");     // 🔹 Para paneles
+<script>
+const params = new URLSearchParams(window.location.search);
+const idPonencia = params.get("ip");      // Ponencias
+const idPanel = params.get("ip2");        // Paneles
+const idLanzamiento = params.get("ip3");  // Lanzamiento de libros
+const idComentarista = params.get("ip4"); // Comentarista de libros
+const comentarista = params.get("com");
 
-    if (!idPonencia && !idPanel) {
-      document.getElementById("contenido").innerHTML = "<p>No se especificó ningún elemento para certificar.</p>";
-    } 
-    else if (idPonencia) {
-      // ==================================================
-      // 🔹 CERTIFICADO DE PONENCIA
-      // ==================================================
-      fetch("api.php", {
-        method: "POST",
-        body: new URLSearchParams({ action: "ver_detalle", id: idPonencia })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const p = data.data;
-          const coautores = p.coautores || [];
-
-          function formatearAutores(autor, coautores) {
-            if (!coautores || coautores.length === 0) return autor;
-            if (coautores.length === 1) return `${autor} y ${coautores[0]}`;
-            const ult = coautores.pop();
-            return `${autor}, ${coautores.join(', ')} y ${ult}`;
-          }
-
-          const listaAutores = formatearAutores(p.nombre_apellido, [...coautores]);
-          const totalAutores = 1 + coautores.length;
-          const verboParticipar = totalAutores > 1 ? "participaron" : "participó";
-          const verboPonentes = totalAutores > 1 ? "ponentes" : "ponente";
-          const fecha = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
-
-          let firma = '';
-          let firma2 = '';
-
-          if (p.id != 273) {
-            firma = `
-              <div class="firma">
-                <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>
-                Copresidente<br>ICON-S Colombia</p>
-              </div>`;
-          }
-
-          if (p.id != 265) {
-            firma2 = `
-                <div class="firma">
-                  <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>
-                  Director<br>Centro de Investigación y Estudios Socio-Jurídicos</p>    
-                </div>`;
-          } else {
-            firma2 = `
-                <div class="firma">
-                  <strong><p>LEONARDO A. ENRÍQUEZ MARTÍNEZ<br></strong>
-                  Decano<br>Facultad de Derecho y Ciencias Políticas</p>    
-                </div>`;
-          }
-
-          const textoCertificado = `
-            <p class="certificate-text">
-              La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
-              Certifican que:
-              <strong>${listaAutores}</strong> ${verboParticipar} en calidad de ${verboPonentes} en el <strong>VII Seminario Internacional de Derecho Público ICON- S Colombia</strong> 
-              <em>"Democracia, Derechos Humanos e Inteligencia Artificial"</em>,
-              con su ponencia titulada: <strong>${p.titulo_ponencia || "Sin título registrado"}</strong>.
-              Este evento académico se realizó los días <strong>22, 23 y 24 de octubre de 2025</strong>,
-              con una intensidad de <strong>30 horas académicas</strong>, en la Universidad de Nariño,
-              en San Juan de Pasto, Colombia.
-            </p>
-            <p class="certificate-text">En constancia de lo anterior, se firma en San Juan de Pasto, ${fecha}.</p>
-
-            <div class="firmas-container">${firma}${firma2}</div>
-          `;
-
-          let botones = `<div class="has-text-centered">`;
-          botones += `
-            <form method="POST" action="pdf/pdf_certificado.php" target="_blank">
-              <input type="hidden" name="id_ponencia" value="${p.id}">
-              <input type="hidden" name="nombre" value="${p.nombre_apellido}">
-              <button class="button autor-btn" type="submit">
-                Certificado: ${p.nombre_apellido}
-              </button>
-            </form>`;
-          coautores.forEach(c => {
-            botones += `
-              <form method="POST" action="pdf/pdf_certificado.php" target="_blank">
-                <input type="hidden" name="id_ponencia" value="${p.id}">
-                <input type="hidden" name="nombre" value="${c}">
-                <button class="button autor-btn" type="submit">
-                  Certificado: ${c}
-                </button>
-              </form>`;
-          });
-          botones += `</div>`;
-
-          document.getElementById("contenido").innerHTML = textoCertificado + botones;
-        } else {
-          document.getElementById("contenido").innerHTML = `<p>${data.error}</p>`;
-        }
-      })
-      .catch(() => {
-        document.getElementById("contenido").innerHTML = "<p>Error al cargar los datos de la ponencia.</p>";
-      });
-    } 
-    else if (idPanel) {
-      // ==================================================
-      // 🔹 CERTIFICADO DE PANEL (tabla panel)
-      // ==================================================
-      fetch("api.php", {
-        method: "POST",
-        body: new URLSearchParams({ action: "ver_detalle_panel", id: idPanel })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const p = data.data;
-          const fecha = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
-          let nombrePanel = (p.no || '').replace(/^.*?:\s*/, '');
-
-          const textoCertificado = `
-            <p class="certificate-text">
-              La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
-              Certifican que:
-              <strong>${p.moderador}</strong> participó como <strong>moderador</strong> del panel <strong>${nombrePanel}</strong> 
-              en el <strong>VII Seminario Internacional de Derecho Público ICON- S Colombia</strong>
-              <em>"Democracia, Derechos Humanos e Inteligencia Artificial"</em>,
-              realizado los días <strong>22, 23 y 24 de octubre de 2025</strong>
-              en la Universidad de Nariño, San Juan de Pasto, Colombia.
-            </p>
-            <p class="certificate-text">En constancia de lo anterior, se firma en San Juan de Pasto, ${fecha}.</p>
-
-            <div class="firmas-container">
-              <div class="firma">
-                <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>
-                Copresidente<br>ICON-S Colombia</p>
-              </div>
-              <div class="firma">
-                <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>
-                Director<br>Centro de Investigación y Estudios Socio-Jurídicos</p>    
-              </div>
-            </div>
-          `;
-
-const boton = `
-  <div class="has-text-centered">
-    <form method="POST" action="pdf/pdf_certificado_panel.php" target="_blank">
-      <input type="hidden" name="id_panel" value="${p.id}">
-      <input type="hidden" name="moderador" value="${p.moderador}">
-      <input type="hidden" name="panel" value="${nombrePanel}">
-      <button class="button autor-btn" type="submit">
-        Certificado: ${p.moderador}
-      </button>
-    </form>
-  </div>`;
+console.log("params:", {
+  idPonencia, idPanel, idLanzamiento, idComentarista, comentarista
+});
 
 
+const contenido = document.getElementById("contenido");
 
-          document.getElementById("contenido").innerHTML = textoCertificado + boton;
-        } else {
-          document.getElementById("contenido").innerHTML = `<p>${data.error}</p>`;
-        }
-      })
-      .catch(() => {
-        document.getElementById("contenido").innerHTML = "<p>Error al cargar los datos del panel.</p>";
-      });
+if (!idPonencia && !idPanel && !idLanzamiento && !idComentarista) {
+  contenido.innerHTML = "<p>No se especificó ningún elemento para certificar.</p>";
+}
+
+/* ============================================================
+   🔹 CERTIFICADO DE PONENCIA
+   ============================================================ */
+if (idPonencia) {
+  fetch("api.php", {
+    method: "POST",
+    body: new URLSearchParams({ action: "ver_detalle", id: idPonencia })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) {
+      contenido.innerHTML = `<p>${data.error}</p>`;
+      return;
     }
-  </script>
+
+    const p = data.data;
+    const coautores = p.coautores || [];
+
+    function formatearAutores(autor, coautores) {
+      if (coautores.length === 0) return autor;
+      if (coautores.length === 1) return `${autor} y ${coautores[0]}`;
+      const ult = coautores.pop();
+      return `${autor}, ${coautores.join(', ')} y ${ult}`;
+    }
+
+    const listaAutores = formatearAutores(p.nombre_apellido, [...coautores]);
+    const totalAutores = 1 + coautores.length;
+    const verboParticipar = totalAutores > 1 ? "participaron" : "participó";
+    const verboPonentes = totalAutores > 1 ? "ponentes" : "ponente";
+    const fecha = new Date().toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
+
+    let agregartexto = "";
+    if (p.titulo_ponencia === "Vigilados sin protección: el riesgo silencioso de nuestros datos biométricos en Bogotá") {
+      agregartexto = "En representación del Semillero de Investigación Alan Turing";
+    }
+
+    let firma = "";
+    let firma2 = "";
+
+    if (p.id != 273) {
+      firma = `
+        <div class="firma">
+          <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>
+          Copresidente<br>ICON-S Colombia</p>
+        </div>`;
+    }
+
+    if (p.id != 265) {
+      firma2 = `
+        <div class="firma">
+          <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>
+          Director<br>Centro de Investigación y Estudios Socio-Jurídicos</p>
+        </div>`;
+    } else {
+      firma2 = `
+        <div class="firma">
+          <strong><p>LEONARDO A. ENRÍQUEZ MARTÍNEZ<br></strong>
+          Decano<br>Facultad de Derecho y Ciencias Políticas</p>
+        </div>`;
+    }
+
+    const textoCertificado = `
+      <p class="certificate-text">
+        La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – 
+        Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
+        certifican que:
+        <strong>${listaAutores}</strong> ${verboParticipar} como ${verboPonentes} en el 
+        <strong>VII Seminario Internacional de Derecho Público ICON- S Colombia</strong>
+        <em>"Democracia, Derechos Humanos e Inteligencia Artificial"</em>,
+        con la ponencia titulada: <strong>${p.titulo_ponencia || "Sin título registrado"}</strong>. 
+        ${agregartexto}.
+        Con una Intensidad de 36 horas academicas, Este evento se realizó los días 22, 23 y 24 de octubre de 2025 en la Universidad de Nariño.
+      </p>
+      <p class="certificate-text">En constancia se firma en San Juan de Pasto, ${fecha}.</p>
+      <div class="firmas-container">${firma}${firma2}</div>
+    `;
+
+    let botones = `<div class="has-text-centered">`;
+    botones += `
+      <form method="POST" action="pdf/pdf_certificado.php" target="_blank">
+        <input type="hidden" name="id_ponencia" value="${p.id}">
+        <input type="hidden" name="nombre" value="${p.nombre_apellido}">
+        <button class="button autor-btn" type="submit">Certificado: ${p.nombre_apellido}</button>
+      </form>`;
+
+    coautores.forEach(c => {
+      botones += `
+        <form method="POST" action="pdf/pdf_certificado.php" target="_blank">
+          <input type="hidden" name="id_ponencia" value="${p.id}">
+          <input type="hidden" name="nombre" value="${c}">
+          <button class="button autor-btn" type="submit">Certificado: ${c}</button>
+        </form>`;
+    });
+
+    botones += `</div>`;
+
+    contenido.innerHTML = textoCertificado + botones;
+  })
+  .catch(() => contenido.innerHTML = "<p>Error al cargar los datos.</p>");
+
+ 
+}
+
+/* ============================================================
+   🔹 CERTIFICADO DE PANEL
+   ============================================================ */
+if (idPanel) {
+  fetch("api.php", {
+    method: "POST",
+    body: new URLSearchParams({ action: "ver_detalle_panel", id: idPanel })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) {
+      contenido.innerHTML = `<p>${data.error}</p>`;
+      return;
+    }
+
+    const p = data.data;
+    const fecha = new Date().toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
+    const nombrePanel = (p.no || "").replace(/^.*?:\s*/, "");
+
+    const textoCertificado = `
+      <p class="certificate-text">
+        La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – 
+        Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
+        certifican que: <strong>${p.moderador}</strong> participó como moderador del panel 
+        <strong>${nombrePanel}</strong> en el marco del VII Seminario Nacional ICON-S Colombia “Democracia, Derechos Humanos e Inteligencia Artificial.
+         Con una Intensidad de 36 horas academicas, Este evento se realizó los días 22, 23 y 24 de octubre de 2025 en la Universidad de Nariño.
+      </p>
+      <p class="certificate-text">En constancia se firma en San Juan de Pasto, ${fecha}.</p>
+
+      <div class="firmas-container">
+        <div class="firma">
+          <strong><p>MILTON CÉSAR JIMENEZ RAMÍREZ<br></strong>
+          Copresidente<br>ICON-S Colombia</p>
+        </div>
+        <div class="firma">
+          <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO<br></strong>
+          Director<br>CIESJU</p>    
+        </div>
+      </div>
+    `;
+
+    const boton = `
+      <div class="has-text-centered">
+        <form method="POST" action="pdf/pdf_certificado_panel.php" target="_blank">
+          <input type="hidden" name="id_panel" value="${p.id}">
+          <input type="hidden" name="moderador" value="${p.moderador}">
+          <input type="hidden" name="panel" value="${nombrePanel}">
+          <button class="button autor-btn" type="submit">Certificado: ${p.moderador}</button>
+        </form>
+      </div>`;
+
+    contenido.innerHTML = textoCertificado + boton;
+  })
+  .catch(() => contenido.innerHTML = "<p>Error al cargar los datos del panel.</p>");
+
+  
+}
+
+/* ============================================================
+   🔹 CERTIFICADO DE LANZAMIENTO DE LIBRO (Autor)
+   ============================================================ */
+if (idLanzamiento) {
+  fetch("api.php", {
+    method: "POST",
+    body: new URLSearchParams({ action: "ver_detalle_lanzamiento", id: idLanzamiento })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) {
+      contenido.innerHTML = `<p>${data.error}</p>`;
+      return;
+    }
+
+    const p = data.data;
+    const fecha = new Date().toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
+
+    const textoCertificado = `
+      <p class="certificate-text">
+        La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – 
+        Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
+        certifican que:
+        <strong>${p.moderador}</strong> participó como autor en el lanzamiento del libro 
+        <strong>${p.titulo_libro}</strong>, dentro en el marco del VII Seminario Nacional ICON-S Colombia “Democracia, Derechos Humanos e Inteligencia Artificial.
+        Con una Intensidad de 36 horas academicas, Este evento se realizó los días 22, 23 y 24 de octubre de 2025 en la Universidad de Nariño.
+      </p>
+      <p class="certificate-text">Para constancia se firma en San Juan de Pasto, ${fecha}.</p>
+
+      <div class="firmas-container">
+        <div class="firma">
+          <strong><p>MILTON CÉSAR JIMÉNEZ RAMÍREZ</strong><br>
+          Copresidente ICON-S Colombia</p>
+        </div>
+        <div class="firma">
+          <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO</strong><br>
+          Director CIESJU</p>
+        </div>
+      </div>
+    `;
+
+    const boton = `
+      <div class="has-text-centered">
+        <form method="POST" action="pdf/lanzamiento.php" target="_blank">
+          <input type="hidden" name="id_lanzamiento" value="${p.id}">
+          <input type="hidden" name="moderador" value="${p.moderador}">
+          <input type="hidden" name="titulo_libro" value='${p.titulo_libro}'>
+          <button class="button autor-btn" type="submit">Certificado: ${p.moderador}</button>
+        </form>
+      </div>
+    `;
+
+    contenido.innerHTML = textoCertificado + boton;
+  })
+  .catch(() => contenido.innerHTML = "<p>Error al cargar los datos del lanzamiento.</p>");
+
+  
+}
+
+/* ============================================================
+   🔹 CERTIFICADO DE COMENTARISTA DE LIBRO
+   ============================================================ */
+if (idComentarista) {
+  fetch("api.php", {
+    method: "POST",
+    body: new URLSearchParams({
+      action: "ver_detalle_comentarista",
+      id: idComentarista
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) {
+      contenido.innerHTML = `<p>${data.error}</p>`;
+      return;
+    }
+
+    // SOLO tomamos el libro desde la API
+    const libro = data.data.titulo_libro;
+    const fecha = new Date().toLocaleDateString("es-CO", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+
+    const textoCertificado = `
+      <p class="certificate-text">
+        La Sociedad Internacional de Derecho Público (ICON - S) y La Facultad de Derecho y Ciencias Políticas – 
+        Centro de Investigaciones Socio jurídicas – CIESJU de la Universidad de Nariño
+        certifican que: <strong>${comentarista}</strong> participó como comentarista 
+        del libro <strong>${libro}</strong> en el marco del VII Seminario Nacional ICON-S Colombia “Democracia, Derechos Humanos e Inteligencia Artificial.
+        Con una Intensidad de 36 horas academicas, Este evento se realizó los días 22, 23 y 24 de octubre de 2025 en la Universidad de Nariño.
+      </p>
+      <p class="certificate-text">Firmado en San Juan de Pasto, ${fecha}.</p>
+
+      <div class="firmas-container">
+        <div class="firma">
+          <strong><p>MILTON CÉSAR JIMÉNEZ RAMÍREZ</strong><br>
+          Copresidente ICON-S Colombia</p>
+        </div>
+        <div class="firma">
+          <strong><p>CRISTHIAN ALEXANDER PEREIRA OTERO</strong><br>
+          Director CIESJU</p>
+        </div>
+      </div>
+    `;
+
+    const boton = `
+      <div class="has-text-centered">
+        <form method="POST" action="pdf/comentarista.php" target="_blank">
+          <input type="hidden" name="id_comentarista" value="${idComentarista}">
+          <input type="hidden" name="comentarista" value="${comentarista}">
+          <input type="hidden" name="titulo_libro" value='${libro}''>
+          <button class="button autor-btn" type="submit">Certificado: ${comentarista}</button>
+        </form>
+      </div>
+    `;
+
+    contenido.innerHTML = textoCertificado + boton;
+  })
+  .catch(() => contenido.innerHTML = "<p>Error al cargar datos del comentarista.</p>");
+}
+</script>
+
+
+  
 </body>
 </html>
